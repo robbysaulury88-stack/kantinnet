@@ -1,9 +1,43 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
-    <title>Website Pertamaku</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QR Scanner HTTPS Saya</title>
+    <!-- Memanggil library scanner via CDN -->
+    <script src="https://unpkg.com" type="text/javascript"></script>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+        #reader { width: 100%; max-width: 500px; margin: 0 auto; }
+        #result { margin-top: 20px; font-weight: bold; color: green; }
+    </style>
 </head>
 <body>
-    <h1>Halo Dunia! Ini website gratis dari GitHub Pages.</h1>
+
+    <h1>QR Code Scanner</h1>
+    <!-- Tempat kamera muncul -->
+    <div id="reader"></div>
+    <!-- Tempat hasil scan muncul -->
+    <div id="result"></div>
+
+    <script>
+        function onScanSuccess(decodedText, decodedResult) {
+            // Aksi saat QR Code berhasil dibaca
+            document.getElementById('result').innerHTML = `Hasil: <a href="${decodedText}" target="_blank">${decodedText}</a>`;
+            
+            // Opsional: Otomatis membuka link jika hasil scan berupa URL
+            if(decodedText.startsWith('http')) {
+                window.location.href = decodedText;
+            }
+        }
+
+        function onScanFailure(error) {
+            // Abaikan error saat kamera sedang mencari QR code
+        }
+
+        let html5QrcodeScanner = new Html5QrcodeScanner(
+            "reader", { fps: 10, qrbox: 250 }, /* opsi fps & ukuran kotak */ false);
+        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+    </script>
 </body>
 </html>
