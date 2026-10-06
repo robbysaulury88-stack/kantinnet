@@ -7,37 +7,59 @@
     <!-- Memanggil library scanner via CDN -->
     <script src="https://unpkg.com" type="text/javascript"></script>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-        #reader { width: 100%; max-width: 500px; margin: 0 auto; }
-        #result { margin-top: 20px; font-weight: bold; color: green; }
+        body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; background-color: #f9f9f9; }
+        #reader { width: 100%; max-width: 500px; margin: 0 auto; background: white; border: 1px solid #ccc; border-radius: 8px; overflow: hidden; }
+        #result { margin-top: 20px; font-weight: bold; color: green; font-size: 18px; }
+        .btn-start { padding: 12px 24px; font-size: 16px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
     <h1>QR Code Scanner</h1>
+    
+    <!-- Tombol manual untuk memicu izin kamera jika otomatis gagal -->
+    <button class="btn-start" id="start-btn" onclick="mulaiScanner()">Buka Kamera</button>
+    
     <!-- Tempat kamera muncul -->
-    <div id="reader"></div>
+    <div id="reader" style="display: none;"></div>
+    
     <!-- Tempat hasil scan muncul -->
     <div id="result"></div>
 
     <script>
+        let html5QrcodeScanner;
+
         function onScanSuccess(decodedText, decodedResult) {
-            // Aksi saat QR Code berhasil dibaca
-            document.getElementById('result').innerHTML = `Hasil: <a href="${decodedText}" target="_blank">${decodedText}</a>`;
+            document.getElementById('result').innerHTML = `Hasil Scan: <a href="${decodedText}" target="_blank">${decodedText}</a>`;
             
-            // Opsional: Otomatis membuka link jika hasil scan berupa URL
+            // Otomatis menuju ke link jika hasil scan berupa URL
             if(decodedText.startsWith('http')) {
                 window.location.href = decodedText;
             }
         }
 
         function onScanFailure(error) {
-            // Abaikan error saat kamera sedang mencari QR code
+            // Mengabaikan error pencarian frame kamera
         }
 
-        let html5QrcodeScanner = new Html5QrcodeScanner(
-            "reader", { fps: 10, qrbox: 250 }, /* opsi fps & ukuran kotak */ false);
-        html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+        function mulaiScanner() {
+            // Sembunyikan tombol dan tampilkan box kamera
+            document.getElementById('start-btn').style.display = 'none';
+            document.getElementById('reader').style.display = 'block';
+
+            // Inisialisasi scanner dengan konfigurasi ramah perangkat mobile
+            html5QrcodeScanner = new Html5QrcodeScanner(
+                "reader", 
+                { 
+                    fps: 10, 
+                    qrbox: 250,
+                    rememberLastUsedCamera: true, // Mengingat kamera terakhir yang diizinkan
+                    supportedScanTypes: [Html5QrcodeScanType.SCAN_TYPE_CAMERA] 
+                }, 
+                false
+            );
+            html5QrcodeScanner.render(onScanSuccess, onScanFailure);
+        }
     </script>
 </body>
 </html>
